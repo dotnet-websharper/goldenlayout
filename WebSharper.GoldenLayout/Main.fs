@@ -1,6 +1,7 @@
 namespace WebSharper.GoldenLayout.Extension
 
 open WebSharper
+open WebSharper.JavaScript
 open WebSharper.InterfaceGenerator
 
 module Definition =
@@ -119,8 +120,50 @@ module Definition =
                     "content", Type.ArrayOf ItemConfig.Type
                 ]
         }
+    let BrowserWindowClass = Class "BrowserWindow"
+    let EventEmitterClass = Class "EventEmitter"
+    let LayoutEvents =
+        Pattern.EnumStrings "LayoutEvents"
+            [
+                "initialised"
+                "stateChanged"
+                "windowOpened"
+                "windowClosed"
+                "selectionChanged"
+                "itemDestroyed"
+                "itemCreated"
+                "componentCreated"
+                "rowCreated"
+                "columnCreated"
+                "stackCreated"
+                "tabCreated"
+            ]
+    let EventType = LayoutEvents + T<string>
 
-
+    let GoldenLayout =
+        Class "GoldenLayout"
+        |+> Static [
+            Constructor (LayoutConfig?configuration * !?(T<JQuery.JQuery> + T<Dom.Element>)?container)
+        ]
+        |+> Instance [
+            "root" =? T<obj>
+            "container" =? T<JQuery.JQuery>
+            "isInitialised" =? T<bool>
+            "config" =? LayoutConfig.Type
+            "selectedItem" =? T<obj>
+            "width" =? T<int>
+            "height" =? T<int>
+            "openPopouts" =? Type.ArrayOf BrowserWindowClass.Type
+            "isSubWindow" =? T<bool>
+            "eventHub" =? EventEmitterClass.Type
+            ("registerComponent"
+                => T<string>?name
+                ^-> (
+                    (T<Dom.Element>?container ^-> T<obj>?state ^-> T<obj>) + 
+                    (T<Dom.Element>?container ^-> T<obj>?state ^-> T<unit>)
+                )?component
+                ^-> T<unit>) //TODO: must test thoroughly
+        ]
 
     let Assembly =
         Assembly [
