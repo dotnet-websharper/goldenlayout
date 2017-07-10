@@ -422,6 +422,27 @@ module Definition =
             "setActive" => T<bool>?isActive ^-> T<unit>
         ]
 
+    let EventEmitter =
+        EventEmitterClass
+        |+> Instance [
+            "on" => EventType?eventName
+                ^-> T<JavaScript.Function>?callback
+                ^-> !? T<obj>?context
+                ^-> T<unit>
+            "emit" => EventType?eventName ^-> !+ T<obj> ^-> T<unit> 
+            "trigger" => EventType?eventName ^-> !+ T<obj> ^-> T<unit>
+            "unbind" 
+                => EventType?eventName
+                ^-> !? T<JavaScript.Function>?callback
+                ^-> !? T<obj>?context
+                ^-> T<unit>
+            "off"
+                => EventType?eventName
+                ^-> !? T<JavaScript.Function>?callback
+                ^-> !? T<obj>?context
+                ^-> T<unit>
+        ]
+
     // Assembly
 
     let Assembly =
