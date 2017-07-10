@@ -340,10 +340,10 @@ module Definition =
         |+> Instance [
             "width" =? T<int>
             "height" =? T<int>
-            "parent" =? ContentItem.Type //TODO: not sure
-            "tab" =? T<obj> //TODO: not sure
+            "parent" =? ContentItemClass.Type //TODO: not sure
+            "tab" =? TabClass
             "title" =? T<string>
-            "layoutManager" =? GoldenLayout.Type
+            "layoutManager" =? GoldenLayoutClass.Type
             "isHidden" =? T<bool>
 
             "getElement" => T<unit> ^-> T<JQuery.JQuery>
@@ -353,6 +353,24 @@ module Definition =
             "setSize" => T<int>?widht ^-> T<int>?height ^-> T<unit>
             "setTitle" => T<string>?title ^-> T<unit>
             "close" => T<unit> ^-> T<unit>
+        ]
+
+    // Header
+
+    let Header =
+        HeaderClass
+        |+> Instance [
+            "layoutManager" =? GoldenLayout.Type
+            "parent" =? ContentItem.Type
+            "tabs" =? Type.ArrayOf TabClass
+            "activeContentItem" =? ContentItemClass.Type
+            "element" =? T<JQuery.JQuery>
+            "tabsContainer" =? T<JQuery.JQuery>
+            "controlsContainer" =? T<JQuery.JQuery>
+
+            "setActiveContentItem" => ContentItemClass.Type?contentItem ^-> T<unit>
+            "createTab" => ContentItemClass.Type?contentItem ^-> T<int>?index ^-> T<unit>
+            "removeTab" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
     let Assembly =
