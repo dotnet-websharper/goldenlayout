@@ -19,7 +19,7 @@ module Definition =
     // Events
 
     let LayoutEvents =
-        Pattern.EnumStrings "LayoutEvents"
+        Pattern.EnumStrings "LayoutEvent"
             [
                 "initialised"
                 "stateChanged"
@@ -48,8 +48,22 @@ module Definition =
             "stackCreated"
         ]
 
+    let ContainerEvents =
+        Pattern.EnumStrings "ContainerEvent" [
+            "open"
+            "resize"
+            "destroy"
+            "close"
+            "tab"
+            "hide"
+            "show"
+        ]
 
-    let EventType = LayoutEvents + ItemEvents + T<string>
+    let EventType
+        = LayoutEvents
+        + ItemEvents
+        + ContainerEvents
+        + T<string>
 
 
     // Item config
@@ -319,6 +333,27 @@ module Definition =
             "getComponentsByName" => T<string>?name ^-> Type.ArrayOf TSelf
         ]
 
+    // Container
+
+    let Container =
+        ContainerClass
+        |+> Instance [
+            "width" =? T<int>
+            "height" =? T<int>
+            "parent" =? ContentItem.Type //TODO: not sure
+            "tab" =? T<obj> //TODO: not sure
+            "title" =? T<string>
+            "layoutManager" =? GoldenLayout.Type
+            "isHidden" =? T<bool>
+
+            "getElement" => T<unit> ^-> T<JQuery.JQuery>
+            "setState" => T<obj>?state ^-> T<unit>
+            "extendState" => T<obj>?state ^-> T<unit>
+            "getState" => T<unit> ^-> T<obj>
+            "setSize" => T<int>?widht ^-> T<int>?height ^-> T<unit>
+            "setTitle" => T<string>?title ^-> T<unit>
+            "close" => T<unit> ^-> T<unit>
+        ]
 
     let Assembly =
         Assembly [
