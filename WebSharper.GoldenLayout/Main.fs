@@ -6,6 +6,16 @@ open WebSharper.InterfaceGenerator
 
 module Definition =
 
+    //Classes
+
+    let GoldenLayoutClass = Class "GoldenLayout"
+    let ContentItemClass = Class "ContentItem"
+    let ContainerClass = Class "Container"
+    let BrowserWindowClass = Class "BrowserWindow"
+    let HeaderClass = Class "Header"
+    let TabClass = Class "Tab"
+    let EventEmitterClass = Class "EventEmitter"
+
     //Item config
 
     let ComponentConfig =
@@ -81,7 +91,7 @@ module Definition =
         }
 
     let ItemFactory =
-        Class "Item"
+        Class "ItemFactory"
         |+> Static [
             "createComponent" => ComponentConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
                 |> WithInline ("Object.assign({type: " + ComponentString + "}, $special, $general);")
@@ -159,8 +169,7 @@ module Definition =
                     "content", Type.ArrayOf ItemConfig.Type
                 ]
         }
-    let BrowserWindowClass = Class "BrowserWindow"
-    let EventEmitterClass = Class "EventEmitter"
+
     let LayoutEvents =
         Pattern.EnumStrings "LayoutEvents"
             [
@@ -177,12 +186,29 @@ module Definition =
                 "stackCreated"
                 "tabCreated"
             ]
+
     let EventType = LayoutEvents + T<string>
 
+    //GoldenLayout
+
+    let Dimensions =
+        Pattern.Config "Dimensions" {
+            Required =
+                [
+                    "width", T<int>
+                    "height", T<int>
+                    "left", T<int>
+                    "top", T<int>
+                ]
+            Optional = []
+        }
+
     let GoldenLayout =
-        Class "GoldenLayout"
+        GoldenLayoutClass
         |+> Static [
-            Constructor (LayoutConfig?configuration * !?(T<JQuery.JQuery> + T<Dom.Element>)?container)
+            Constructor (LayoutConfig.Type?configuration * !?(T<JQuery.JQuery> + T<Dom.Element>)?container)
+            "minifyConfig" => LayoutConfig.Type?config ^-> T<JavaScript.Object>
+            "unminifyConfig" => T<JavaScript.Object>?minifiedConfig ^-> LayoutConfig.Type
         ]
         |+> Instance [
             "root" =? T<obj>
@@ -203,10 +229,19 @@ module Definition =
                 )?component
                 ^-> T<unit>) //TODO: must test thoroughly
             "init" => T<unit> ^-> T<unit>
-            "toConfig" => T<unit> ^-> T<JavaScript.Object> //TODO: ask about this
-            "getComponent" => T<string>?name ^-> T<obj> //TODO: test
+            "toConfig" => T<unit> ^-> LayoutConfig.Type
+            "getComponent" => T<string>?name ^-> T<JavaScript.Function> //TODO: test
             "updateSize" => !? T<int>?width ^-> !? T<int>?height ^-> T<unit>
             "destroy" => T<unit> ^-> T<unit>
+            "createContentItem" => ItemConfig.Type?itemConfiguration ^-> !? ContentItemClass.Type?parent ^-> T<unit> // Test
+            "createPopout"
+                => (LayoutConfig.Type + ContentItemClass)?configOrContentItem
+                ^-> Dimensions.Type?dimensions
+                ^-> !? T<string>?parentId
+                ^-> !? T<int>?indexInParent
+                ^-> T<unit>
+            "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element ^-> ItemConfig.Type?itemConfiguration ^-> T<unit>
+            "selectItem" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
     let Assembly =
