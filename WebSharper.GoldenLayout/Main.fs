@@ -448,8 +448,38 @@ module Definition =
     let Assembly =
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
+                Resource "JS" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
+                |> AssemblyWide
+                Resource "CSS" "https://golden-layout.com/files/latest/css/goldenlayout-base.css"
+                |> AssemblyWide
+
             ]
             Namespace "WebSharper.GoldenLayout" [
+                LayoutEvents
+                GoldenLayoutClass
+                ContentItemClass
+                ContainerClass
+                BrowserWindowClass
+                HeaderClass
+                TabClass
+                EventEmitterClass
+                ItemEvents
+                ContainerEvents
+                BrowserWindowEvents
+                BrowserWindowConfig
+                ContentItemType
+                Dimensions
+                LayoutConfig
+                ItemFactory
+                LayoutLabels
+                LayoutDimensions
+                LayoutSettings
+                ComponentConfig
+                ReactComponentConfig
+                StackConfig
+                GeneralItemConfig
+                ItemType
+                ItemConfig
             ]
         ]
 
