@@ -26,28 +26,40 @@ module Definition =
             Optional = [ "activeItemIndex", T<int> ]
         }
 
-    let RowConfig =
-        Pattern.Config "Row" {
+    let GeneralItemConfig =
+        Pattern.Config "GeneralItemConfig" {
             Required = []
-            Optional = []
+            Optional =
+                [
+                    "content", Type.ArrayOf TSelf
+                    "width", T<int>
+                    "height", T<int>
+                    "id", T<string> + Type.ArrayOf T<string>
+                    "isClosable", T<bool>
+                    "title", T<string>
+                ]
         }
 
-    let ColumnConfig =
-        Pattern.Config "Column" {
-            Required = []
-            Optional = []
-        }
+    let ComponentString = "component"
+    let ReactComponentString = "react-component"
+    let RowString = "row"
+    let ColumnString = "column"
+    let StackString = "stack"
+
+    let ItemType =
+        Pattern.EnumStrings "ItemType" [
+            ComponentString
+            ReactComponentString
+            RowString
+            ColumnString
+            StackString
+        ]
 
     let ItemConfig =
         Pattern.Config "ItemConfig" {
             Required =
                 [
-                    "type",
-                        ComponentConfig.Type +
-                        ReactComponentConfig.Type +
-                        StackConfig.Type +
-                        RowConfig.Type +
-                        ColumnConfig.Type
+                    "type", ItemType.Type
                 ]
             Optional = 
                 [
@@ -55,10 +67,37 @@ module Definition =
                     "width", T<int>
                     "height", T<int>
                     "id", T<string> + Type.ArrayOf T<string>
-                    "isClosavle", T<bool>
+                    "isClosable", T<bool>
                     "title", T<string>
+                    //type = "component"
+                    "componentName", T<string>
+                    "componentState", T<obj>
+                    //type = "react-component"
+                    "component", T<string>
+                    "props", T<obj>
+                    //type = "stack"
+                    "activeItemIndex", T<int>
                 ]
         }
+
+    let ItemFactory =
+        Class "Item"
+        |+> Static [
+            "createComponent" => ComponentConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
+                |> WithInline ("Object.assign({type: " + ComponentString + "}, $special, $general);")
+
+            "createReactComponent" => ReactComponentConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
+                |> WithInline ("Object.assign({type: " + ReactComponentString + "}, $special, $general);")
+
+            "createStack" => StackConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
+                |> WithInline ("Object.assign({type: " + StackString + "}, $special, $general);")
+
+            "createRow" => GeneralItemConfig.Type?general ^-> ItemConfig
+                |> WithInline ("Object.assign({type: " + RowString + "}, $special, $general);")
+
+            "createColumn" => GeneralItemConfig.Type?general ^-> ItemConfig
+                |> WithInline ("Object.assign({type: " + ColumnString + "}, $special, $general);")
+        ]
 
     //Layout config 
 
@@ -163,6 +202,11 @@ module Definition =
                     (T<Dom.Element>?container ^-> T<obj>?state ^-> T<unit>)
                 )?component
                 ^-> T<unit>) //TODO: must test thoroughly
+            "init" => T<unit> ^-> T<unit>
+            "toConfig" => T<unit> ^-> T<JavaScript.Object> //TODO: ask about this
+            "getComponent" => T<string>?name ^-> T<obj> //TODO: test
+            "updateSize" => !? T<int>?width ^-> !? T<int>?height ^-> T<unit>
+            "destroy" => T<unit> ^-> T<unit>
         ]
 
     let Assembly =
