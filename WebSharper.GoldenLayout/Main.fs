@@ -59,10 +59,17 @@ module Definition =
             "show"
         ]
 
+    let BrowserWindowEvents =
+        Pattern.EnumStrings "BrowserWindowEvent" [
+            "initialised"
+            "closed"
+        ]
+
     let EventType
         = LayoutEvents
         + ItemEvents
         + ContainerEvents
+        + BrowserWindowEvents
         + T<string>
 
 
@@ -353,6 +360,32 @@ module Definition =
             "setSize" => T<int>?widht ^-> T<int>?height ^-> T<unit>
             "setTitle" => T<string>?title ^-> T<unit>
             "close" => T<unit> ^-> T<unit>
+        ]
+
+    // BrowserWindow
+
+    let BrowserWindowConfig = 
+        Pattern.Config "BrowserWindowConfig" {
+            Required = 
+                [
+                    "dimensions", Dimensions.Type
+                    "content", Type.ArrayOf ItemConfig.Type
+                    "parentId", T<string> //TODO: possible T<string []> too?
+                    "indexInParent", T<int>
+                ]
+            Optional = []
+        }
+
+    let BrowserWindow =
+        BrowserWindowClass
+        |+> Instance [
+            "isInitialised" =? T<bool>
+
+            "toConfig" => T<unit> ^-> BrowserWindowConfig.Type
+            "getGlInstance" => T<unit> ^-> GoldenLayoutClass.Type
+            "getWindow" => T<unit> ^-> T<JavaScript.Window>
+            "close" => T<unit> ^-> T<unit>
+            "popIn" => T<unit> ^-> T<unit>
         ]
 
     // Header
