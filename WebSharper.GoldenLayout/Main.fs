@@ -406,6 +406,24 @@ module Definition =
             "removeTab" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
+    // Tab
+
+    let Tab =
+        TabClass
+        |+> Instance [
+            "isActive" =? T<bool>
+            "header" =? HeaderClass.Type
+            "contentItem" =? ContentItemClass.Type
+            "element" =? T<JQuery.JQuery>
+            "titleElement" =? T<JQuery.JQuery>
+            "closeElement" =? T<JQuery.JQuery>
+
+            "setTitle" => T<string>?string ^-> T<unit>
+            "setActive" => T<bool>?isActive ^-> T<unit>
+        ]
+
+    // Assembly
+
     let Assembly =
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
