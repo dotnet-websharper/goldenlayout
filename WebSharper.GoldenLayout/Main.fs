@@ -6,7 +6,7 @@ open WebSharper.InterfaceGenerator
 
 module Definition =
 
-    //Classes
+    // Classes
 
     let GoldenLayoutClass = Class "GoldenLayout"
     let ContentItemClass = Class "ContentItem"
@@ -16,7 +16,43 @@ module Definition =
     let TabClass = Class "Tab"
     let EventEmitterClass = Class "EventEmitter"
 
-    //Item config
+    // Events
+
+    let LayoutEvents =
+        Pattern.EnumStrings "LayoutEvents"
+            [
+                "initialised"
+                "stateChanged"
+                "windowOpened"
+                "windowClosed"
+                "selectionChanged"
+                "itemDestroyed"
+                "itemCreated"
+                "componentCreated"
+                "rowCreated"
+                "columnCreated"
+                "stackCreated"
+                "tabCreated"
+            ]
+
+    let ItemEvents =
+        Pattern.EnumStrings "ItemEvent" [
+            "stateChanged"
+            "titleChanged"
+            "activeContentItemChanged"
+            "itemDestroyed"
+            "itemCreated"
+            "componentCreated"
+            "rowCreated"
+            "columnCreated"
+            "stackCreated"
+        ]
+
+
+    let EventType = LayoutEvents + ItemEvents + T<string>
+
+
+    // Item config
 
     let ComponentConfig =
         Pattern.Config "Component" {
@@ -109,7 +145,7 @@ module Definition =
                 |> WithInline ("Object.assign({type: " + ColumnString + "}, $special, $general);")
         ]
 
-    //Layout config 
+    // Layout config 
 
     let LayoutSettings =
         Pattern.Config "LayoutSettings" {
@@ -170,26 +206,7 @@ module Definition =
                 ]
         }
 
-    let LayoutEvents =
-        Pattern.EnumStrings "LayoutEvents"
-            [
-                "initialised"
-                "stateChanged"
-                "windowOpened"
-                "windowClosed"
-                "selectionChanged"
-                "itemDestroyed"
-                "itemCreated"
-                "componentCreated"
-                "rowCreated"
-                "columnCreated"
-                "stackCreated"
-                "tabCreated"
-            ]
-
-    let EventType = LayoutEvents + T<string>
-
-    //GoldenLayout
+    // GoldenLayout
 
     let Dimensions =
         Pattern.Config "Dimensions" {
@@ -207,8 +224,8 @@ module Definition =
         GoldenLayoutClass
         |+> Static [
             Constructor (LayoutConfig.Type?configuration * !?(T<JQuery.JQuery> + T<Dom.Element>)?container)
-            "minifyConfig" => LayoutConfig.Type?config ^-> T<JavaScript.Object>
-            "unminifyConfig" => T<JavaScript.Object>?minifiedConfig ^-> LayoutConfig.Type
+            "minifyConfig" => LayoutConfig.Type?config ^-> T<obj>
+            "unminifyConfig" => T<obj>?minifiedConfig ^-> LayoutConfig.Type
         ]
         |+> Instance [
             "root" =? T<obj>
@@ -243,6 +260,65 @@ module Definition =
             "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element ^-> ItemConfig.Type?itemConfiguration ^-> T<unit>
             "selectItem" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
+
+    // ContentItem
+
+    let ContentItemType =
+        Pattern.EnumStrings "ContentItemType" [
+            "row"
+            "column"
+            "stack"
+            "component"
+            "root"
+        ]
+
+    let ContentItem =
+        ContentItemClass
+        |+> Instance [
+            "config" =? ItemConfig.Type
+            "type" =? ContentItemType.Type
+            "contentItems" =? Type.ArrayOf TSelf
+            "parent" =? TSelf
+            "id" =? T<string> + Type.ArrayOf T<obj>
+            "isInitialised" =? T<bool>
+            "isMaximised" =? T<bool>
+            "isRoot" =? T<bool>
+            "isRow" =? T<bool>
+            "isColumn" =? T<bool>
+            "isStack" =? T<bool>
+            "isComponent" =? T<bool>
+            "layoutManager" =? GoldenLayout.Type //TODO: test
+            "element" =? T<Dom.Element>
+            "childElementContainer" =? T<Dom.Element>
+            
+            "addChild" => (TSelf + ItemConfig.Type)?itemOrItemConfig ^-> !? T<int>?index ^-> T<unit>
+            "removeChild" => TSelf?contentItem ^-> !? T<bool>?keepChild ^-> T<unit>
+            "replaceChild" => TSelf?oldChild ^-> (TSelf + ItemConfig.Type)?newChild ^-> T<unit>
+            "setSize" => T<unit> ^-> T<unit>
+            "setTitle" => T<string>?title ^-> T<unit>
+            "callDownwards"
+                => T<string>?functionName
+                ^-> !? T<obj []>?functionArguments
+                ^-> !? T<bool>?bottomUp
+                ^-> !? T<bool>? skipSelf
+                ^-> T<unit>
+            "emitBubblingEvent" => EventType?name ^-> T<string>
+            "remove" => T<unit> ^-> T<unit>
+            "popout" => T<unit> ^-> T<unit>
+            "toggleMaximise" => T<unit> ^-> T<unit>
+            "select" => T<unit> ^-> T<unit>
+            "deselect" => T<unit> ^-> T<unit>
+            "hasId" => T<string>?id ^-> T<string>
+            "setActiveContentItem" => TSelf?contentItem ^-> T<unit>
+            "getActiveContentItem" => T<unit> ^-> TSelf
+            "addId" => T<string>?id ^-> T<unit>
+            "removeId" => T<string>?id ^-> T<unit>
+            "getItemsByFilter" => (TSelf ^-> T<bool>)?filterFunction ^-> Type.ArrayOf TSelf
+            "getItemsById" => T<string>?id ^-> Type.ArrayOf TSelf
+            "getItemsByType" => ContentItemType.Type ^-> Type.ArrayOf TSelf
+            "getComponentsByName" => T<string>?name ^-> Type.ArrayOf TSelf
+        ]
+
 
     let Assembly =
         Assembly [
