@@ -448,7 +448,7 @@ module Definition =
     let Assembly =
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
-                Resource "Js" "http://golden-layout.com/files/latest/js/goldenlayout.js" |> AssemblyWide
+                Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js" |> AssemblyWide
                 Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css" |> AssemblyWide
                 Resource "DarkTheme" "http://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
                 Resource "LightTheme" "http://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
