@@ -93,11 +93,11 @@ module Definition =
             Optional = [ "activeItemIndex", T<int> ]
         }
 
-    let ComponentString = "component"
-    let ReactComponentString = "react-component"
-    let RowString = "row"
-    let ColumnString = "column"
-    let StackString = "stack"
+    let [<Literal>] ComponentString = "component"
+    let [<Literal>] ReactComponentString = "react-component"
+    let [<Literal>] RowString = "row"
+    let [<Literal>] ColumnString = "column"
+    let [<Literal>] StackString = "stack"
 
     let ItemType =
         Pattern.EnumStrings "ItemType" [
@@ -151,19 +151,19 @@ module Definition =
         Class "ItemFactory"
         |+> Static [
             "createComponent" => ComponentConfig.Type?special * ItemConfig.Type?general ^-> GeneralItemConfig
-                |> WithInline ("return Object.assign({type: " + ComponentString + "}, $special, $general);")
+                |> WithInline ("return Object.assign({type: '" + ComponentString + "'}, $special, $general);")
 
             "createReactComponent" => ReactComponentConfig.Type?special * ItemConfig.Type?general ^-> GeneralItemConfig
-                |> WithInline ("return Object.assign({type: " + ReactComponentString + "}, $special, $general);")
+                |> WithInline ("return Object.assign({type: '" + ReactComponentString + "'}, $special, $general);")
 
             "createStack" => StackConfig.Type?special * ItemConfig.Type?general ^-> GeneralItemConfig
-                |> WithInline ("return Object.assign({type: " + StackString + "}, $special, $general);")
+                |> WithInline ("return Object.assign({type: '" + StackString + "'}, $special, $general);")
 
             "createRow" => ItemConfig.Type?general ^-> GeneralItemConfig
-                |> WithInline ("return Object.assign({type: " + RowString + "}, $special, $general);")
+                |> WithInline ("return Object.assign({type: '" + RowString + "'}, $special, $general);")
 
             "createColumn" => ItemConfig.Type?general ^-> GeneralItemConfig
-                |> WithInline ("return Object.assign({type: " + ColumnString + "}, $special, $general);")
+                |> WithInline ("return Object.assign({type: '" + ColumnString + "'}, $special, $general);")
         ]
 
     // Layout config 
@@ -259,26 +259,26 @@ module Definition =
             "openPopouts" =? Type.ArrayOf BrowserWindowClass.Type
             "isSubWindow" =? T<bool>
             "eventHub" =? EventEmitterClass.Type
-            ("registerComponent"
+            "registerComponent"
                 => T<string>?name
-                ^-> (
-                    (T<Dom.Element>?container ^-> T<obj>?state ^-> T<obj>) + 
-                    (T<Dom.Element>?container ^-> T<obj>?state ^-> T<unit>)
+                * (
+                    (ContainerClass.Type?container * T<obj>?state ^-> T<obj>) + 
+                    (ContainerClass.Type?container * T<obj>?state ^-> T<unit>)
                 )?componentCreator
-                ^-> T<unit>) //TODO: must test thoroughly
+                ^-> T<unit> //TODO: must test thoroughly
             "init" => T<unit> ^-> T<unit>
             "toConfig" => T<unit> ^-> LayoutConfig.Type
             "getComponent" => T<string>?name ^-> T<JavaScript.Function> //TODO: test
             "updateSize" => !? T<int>?width ^-> !? T<int>?height ^-> T<unit>
             "destroy" => T<unit> ^-> T<unit>
-            "createContentItem" => GeneralItemConfig.Type?GeneralItemConfiguration ^-> !? ContentItemClass.Type?parent ^-> T<unit> // Test
+            "createContentItem" => GeneralItemConfig.Type?GeneralItemConfiguration * !? ContentItemClass.Type?parent ^-> T<unit> // Test
             "createPopout"
                 => (LayoutConfig.Type + ContentItemClass)?configOrContentItem
-                ^-> Dimensions.Type?dimensions
-                ^-> !? T<string>?parentId
-                ^-> !? T<int>?indexInParent
+                * Dimensions.Type?dimensions
+                * !? T<string>?parentId
+                * !? T<int>?indexInParent
                 ^-> T<unit>
-            "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element ^-> GeneralItemConfig.Type?GeneralItemConfiguration ^-> T<unit>
+            "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element * GeneralItemConfig.Type?GeneralItemConfiguration ^-> T<unit>
             "selectItem" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
@@ -309,8 +309,8 @@ module Definition =
             "isStack" =? T<bool>
             "isComponent" =? T<bool>
             "layoutManager" =? GoldenLayout.Type //TODO: test
-            "element" =? T<Dom.Element>
-            "childElementContainer" =? T<Dom.Element>
+            "element" =? T<JQuery.JQuery> //TODO: test
+            "childElementContainer" =? T<JQuery.JQuery> //TODO: test
             
             "addChild" => (TSelf + GeneralItemConfig.Type)?itemOrGeneralItemConfig ^-> !? T<int>?index ^-> T<unit>
             "removeChild" => TSelf?contentItem ^-> !? T<bool>?keepChild ^-> T<unit>
@@ -446,16 +446,15 @@ module Definition =
     // Assembly
 
     let Assembly =
-        let baseCss = Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css"
+        //let baseCss = Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css"
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
                 Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
                     |> AssemblyWide
                     |> RequiresExternal [ T<WebSharper.JQuery.Resources.JQuery> ]
+                Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css" 
                 Resource "DarkTheme" "http://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
-                    |> Requires [ baseCss ]
                 Resource "LightTheme" "http://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
-                    |> Requires [ baseCss ]
             ]
             Namespace "WebSharper.GoldenLayout" [
                 LayoutEvents
