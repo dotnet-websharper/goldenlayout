@@ -34,7 +34,7 @@ bt.Solution [
                 Title = Some "WebSharper.GoldenLayout"
                 LicenseUrl = Some "http://websharper.com/licensing"
                 ProjectUrl = Some "https://github.com/intellifactory/https://github.com/intellifactory/websharper.goldenlayout"
-                Description = "WebSharper extension for GoldenLayout"
+                Description = "WebSharper Extensions for GoldenLAyout[D[D[D[a"
                 RequiresLicenseAcceptance = true })
         .Add(main)
 ]

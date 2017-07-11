@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>20f8ce1d-b43c-431a-8fe8-531f858473b5</ProjectGuid>
+    <ProjectGuid>4e381706-b471-47e7-9d90-d0d33abdfaf7</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>WebSharper.GoldenLayout.Sample</RootNamespace>
     <AssemblyName>WebSharper.GoldenLayout.Sample</AssemblyName>
@@ -18,11 +18,12 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>WebSharper.GoldenLayout.Sample</Name>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -144,7 +145,7 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>50724</DevelopmentServerPort>
+          <DevelopmentServerPort>51637</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:50724/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
