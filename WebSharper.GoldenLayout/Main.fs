@@ -93,20 +93,6 @@ module Definition =
             Optional = [ "activeItemIndex", T<int> ]
         }
 
-    let GeneralItemConfig =
-        Pattern.Config "GeneralItemConfig" {
-            Required = []
-            Optional =
-                [
-                    "content", Type.ArrayOf TSelf
-                    "width", T<int>
-                    "height", T<int>
-                    "id", T<string> + Type.ArrayOf T<string>
-                    "isClosable", T<bool>
-                    "title", T<string>
-                ]
-        }
-
     let ComponentString = "component"
     let ReactComponentString = "react-component"
     let RowString = "row"
@@ -122,8 +108,8 @@ module Definition =
             StackString
         ]
 
-    let ItemConfig =
-        Pattern.Config "ItemConfig" {
+    let GeneralItemConfig =
+        Pattern.Config "GeneralItemConfig" {
             Required =
                 [
                     "type", ItemType.Type
@@ -147,23 +133,37 @@ module Definition =
                 ]
         }
 
+    let ItemConfig =
+        Pattern.Config "Item" {
+            Required = []
+            Optional =
+                [
+                    "content", Type.ArrayOf GeneralItemConfig
+                    "width", T<int>
+                    "height", T<int>
+                    "id", T<string> + Type.ArrayOf T<string>
+                    "isClosable", T<bool>
+                    "title", T<string>
+                ]
+        }
+
     let ItemFactory =
         Class "ItemFactory"
         |+> Static [
-            "createComponent" => ComponentConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
-                |> WithInline ("Object.assign({type: " + ComponentString + "}, $special, $general);")
+            "createComponent" => ComponentConfig.Type?special * ItemConfig.Type?general ^-> GeneralItemConfig
+                |> WithInline ("return Object.assign({type: " + ComponentString + "}, $special, $general);")
 
-            "createReactComponent" => ReactComponentConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
-                |> WithInline ("Object.assign({type: " + ReactComponentString + "}, $special, $general);")
+            "createReactComponent" => ReactComponentConfig.Type?special * ItemConfig.Type?general ^-> GeneralItemConfig
+                |> WithInline ("return Object.assign({type: " + ReactComponentString + "}, $special, $general);")
 
-            "createStack" => StackConfig.Type?special ^-> GeneralItemConfig.Type?general ^-> ItemConfig
-                |> WithInline ("Object.assign({type: " + StackString + "}, $special, $general);")
+            "createStack" => StackConfig.Type?special * ItemConfig.Type?general ^-> GeneralItemConfig
+                |> WithInline ("return Object.assign({type: " + StackString + "}, $special, $general);")
 
-            "createRow" => GeneralItemConfig.Type?general ^-> ItemConfig
-                |> WithInline ("Object.assign({type: " + RowString + "}, $special, $general);")
+            "createRow" => ItemConfig.Type?general ^-> GeneralItemConfig
+                |> WithInline ("return Object.assign({type: " + RowString + "}, $special, $general);")
 
-            "createColumn" => GeneralItemConfig.Type?general ^-> ItemConfig
-                |> WithInline ("Object.assign({type: " + ColumnString + "}, $special, $general);")
+            "createColumn" => ItemConfig.Type?general ^-> GeneralItemConfig
+                |> WithInline ("return Object.assign({type: " + ColumnString + "}, $special, $general);")
         ]
 
     // Layout config 
@@ -223,7 +223,7 @@ module Definition =
                     "settings", LayoutSettings.Type
                     "dimensions", LayoutDimensions.Type
                     "labels", LayoutLabels.Type
-                    "content", Type.ArrayOf ItemConfig.Type
+                    "content", Type.ArrayOf GeneralItemConfig.Type
                 ]
         }
 
@@ -264,21 +264,21 @@ module Definition =
                 ^-> (
                     (T<Dom.Element>?container ^-> T<obj>?state ^-> T<obj>) + 
                     (T<Dom.Element>?container ^-> T<obj>?state ^-> T<unit>)
-                )?component
+                )?componentCreator
                 ^-> T<unit>) //TODO: must test thoroughly
             "init" => T<unit> ^-> T<unit>
             "toConfig" => T<unit> ^-> LayoutConfig.Type
             "getComponent" => T<string>?name ^-> T<JavaScript.Function> //TODO: test
             "updateSize" => !? T<int>?width ^-> !? T<int>?height ^-> T<unit>
             "destroy" => T<unit> ^-> T<unit>
-            "createContentItem" => ItemConfig.Type?itemConfiguration ^-> !? ContentItemClass.Type?parent ^-> T<unit> // Test
+            "createContentItem" => GeneralItemConfig.Type?GeneralItemConfiguration ^-> !? ContentItemClass.Type?parent ^-> T<unit> // Test
             "createPopout"
                 => (LayoutConfig.Type + ContentItemClass)?configOrContentItem
                 ^-> Dimensions.Type?dimensions
                 ^-> !? T<string>?parentId
                 ^-> !? T<int>?indexInParent
                 ^-> T<unit>
-            "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element ^-> ItemConfig.Type?itemConfiguration ^-> T<unit>
+            "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element ^-> GeneralItemConfig.Type?GeneralItemConfiguration ^-> T<unit>
             "selectItem" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
@@ -296,7 +296,7 @@ module Definition =
     let ContentItem =
         ContentItemClass
         |+> Instance [
-            "config" =? ItemConfig.Type
+            "config" =? GeneralItemConfig.Type
             "type" =? ContentItemType.Type
             "contentItems" =? Type.ArrayOf TSelf
             "parent" =? TSelf
@@ -312,9 +312,9 @@ module Definition =
             "element" =? T<Dom.Element>
             "childElementContainer" =? T<Dom.Element>
             
-            "addChild" => (TSelf + ItemConfig.Type)?itemOrItemConfig ^-> !? T<int>?index ^-> T<unit>
+            "addChild" => (TSelf + GeneralItemConfig.Type)?itemOrGeneralItemConfig ^-> !? T<int>?index ^-> T<unit>
             "removeChild" => TSelf?contentItem ^-> !? T<bool>?keepChild ^-> T<unit>
-            "replaceChild" => TSelf?oldChild ^-> (TSelf + ItemConfig.Type)?newChild ^-> T<unit>
+            "replaceChild" => TSelf?oldChild ^-> (TSelf + GeneralItemConfig.Type)?newChild ^-> T<unit>
             "setSize" => T<unit> ^-> T<unit>
             "setTitle" => T<string>?title ^-> T<unit>
             "callDownwards"
@@ -369,7 +369,7 @@ module Definition =
             Required = 
                 [
                     "dimensions", Dimensions.Type
-                    "content", Type.ArrayOf ItemConfig.Type
+                    "content", Type.ArrayOf GeneralItemConfig.Type
                     "parentId", T<string> //TODO: possible T<string []> too?
                     "indexInParent", T<int>
                 ]
@@ -446,12 +446,16 @@ module Definition =
     // Assembly
 
     let Assembly =
+        let baseCss = Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css"
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
-                Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js" |> AssemblyWide
-                Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css" |> AssemblyWide
+                Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
+                    |> AssemblyWide
+                    |> RequiresExternal [ T<WebSharper.JQuery.Resources.JQuery> ]
                 Resource "DarkTheme" "http://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
+                    |> Requires [ baseCss ]
                 Resource "LightTheme" "http://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
+                    |> Requires [ baseCss ]
             ]
             Namespace "WebSharper.GoldenLayout" [
                 LayoutEvents
@@ -461,9 +465,9 @@ module Definition =
                 ComponentConfig
                 ReactComponentConfig
                 StackConfig
-                GeneralItemConfig
-                ItemType
                 ItemConfig
+                ItemType
+                GeneralItemConfig
                 ItemFactory
                 LayoutSettings
                 LayoutDimensions
