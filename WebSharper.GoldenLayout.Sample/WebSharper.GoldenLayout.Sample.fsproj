@@ -67,6 +67,9 @@
     <Reference Include="WebSharper.Core.JavaScript">
       <HintPath>..\packages\Zafir.4.0.170.71-beta7\lib\net40\WebSharper.Core.JavaScript.dll</HintPath>
     </Reference>
+    <Reference Include="WebSharper.GoldenLayout">
+      <HintPath>..\build\net40\WebSharper.GoldenLayout.dll</HintPath>
+    </Reference>
     <Reference Include="WebSharper.InterfaceGenerator">
       <HintPath>..\packages\Zafir.4.0.170.71-beta7\lib\net40\WebSharper.InterfaceGenerator.dll</HintPath>
     </Reference>
