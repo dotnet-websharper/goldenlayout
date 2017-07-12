@@ -6,17 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="Content/WebSharper.GoldenLayout.Sample.css" />
     <style>
+        #menu {
+            height: 2em;
+            position: absolute;
+            width: 100%;
+            top: 0%;
+            left: 0%;
+        }
+        #gl-container {
+            height: 90%;
+            width: 100%;
+            position: absolute;
+            top: 2em;
+            left: 0%;
+        }
         /* Don't show the not-yet-loaded templates */
         [ws-template], [ws-children-template] { display: none; }
-        html {
-            height: 100wh;
-        }
     </style>
     <script type="text/javascript" src="Content/WebSharper.GoldenLayout.Sample.head.js"></script>
 </head>
 <body id="main">
-    <div id="gl-cont" style="height:500px">
-
+    <div id="menu" ws-children-template="AddTemplate">
+        <input type="text" ws-var="TabName" />
+        <button ws-onclick="TabCreate" >Create Tab</button>
+        <button ws-onclick="LogButton">Log</button>
+    </div>
+    <div id="gl-container">
     </div>
     <script type="text/javascript" src="Content/WebSharper.GoldenLayout.Sample.min.js"></script>
 </body>
