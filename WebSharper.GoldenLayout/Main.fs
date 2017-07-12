@@ -122,13 +122,13 @@ module Definition =
                     "id", T<string> + Type.ArrayOf T<string>
                     "isClosable", T<bool>
                     "title", T<string>
-                    //type = "component"
+                    //when type = "component"
                     "componentName", T<string>
                     "componentState", T<obj>
-                    //type = "react-component"
+                    //when type = "react-component"
                     "component", T<string>
                     "props", T<obj>
-                    //type = "stack"
+                    //when type = "stack"
                     "activeItemIndex", T<int>
                 ]
         }
@@ -261,24 +261,27 @@ module Definition =
             "eventHub" =? EventEmitterClass.Type
             "registerComponent"
                 => T<string>?name
-                * (
-                    (ContainerClass.Type?container * T<obj>?state ^-> T<obj>) + 
-                    (ContainerClass.Type?container * T<obj>?state ^-> T<unit>)
-                )?componentCreator
-                ^-> T<unit> //TODO: must test thoroughly
+                * (ContainerClass.Type?container * T<obj>?state ^-> T<unit>)?componentCreator
+                ^-> T<unit>
             "init" => T<unit> ^-> T<unit>
             "toConfig" => T<unit> ^-> LayoutConfig.Type
             "getComponent" => T<string>?name ^-> T<JavaScript.Function> //TODO: test
-            "updateSize" => !? T<int>?width ^-> !? T<int>?height ^-> T<unit>
+            "updateSize" => !? T<int>?width * !? T<int>?height ^-> T<unit>
             "destroy" => T<unit> ^-> T<unit>
-            "createContentItem" => GeneralItemConfig.Type?GeneralItemConfiguration * !? ContentItemClass.Type?parent ^-> T<unit> // Test
+            "createContentItem"
+                => GeneralItemConfig.Type?itemConfiguration
+                * !? ContentItemClass.Type?parent
+                ^-> T<unit> // Test
             "createPopout"
                 => (LayoutConfig.Type + ContentItemClass)?configOrContentItem
                 * Dimensions.Type?dimensions
                 * !? T<string>?parentId
                 * !? T<int>?indexInParent
                 ^-> T<unit>
-            "createDragSource" => (T<Dom.Element> + T<JQuery.JQuery>)?element * GeneralItemConfig.Type?GeneralItemConfiguration ^-> T<unit>
+            "createDragSource"
+                => (T<Dom.Element> + T<JQuery.JQuery>)?element
+                * GeneralItemConfig.Type?itemConfiguration
+                ^-> T<unit>
             "selectItem" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
@@ -312,16 +315,16 @@ module Definition =
             "element" =? T<JQuery.JQuery> //TODO: test
             "childElementContainer" =? T<JQuery.JQuery> //TODO: test
             
-            "addChild" => (TSelf + GeneralItemConfig.Type)?itemOrGeneralItemConfig ^-> !? T<int>?index ^-> T<unit>
-            "removeChild" => TSelf?contentItem ^-> !? T<bool>?keepChild ^-> T<unit>
-            "replaceChild" => TSelf?oldChild ^-> (TSelf + GeneralItemConfig.Type)?newChild ^-> T<unit>
+            "addChild" => (TSelf + GeneralItemConfig.Type)?itemOrGeneralItemConfig * !? T<int>?index ^-> T<unit>
+            "removeChild" => TSelf?contentItem * !? T<bool>?keepChild ^-> T<unit>
+            "replaceChild" => TSelf?oldChild * (TSelf + GeneralItemConfig.Type)?newChild ^-> T<unit>
             "setSize" => T<unit> ^-> T<unit>
             "setTitle" => T<string>?title ^-> T<unit>
             "callDownwards"
                 => T<string>?functionName
-                ^-> !? T<obj []>?functionArguments
-                ^-> !? T<bool>?bottomUp
-                ^-> !? T<bool>? skipSelf
+                * !? T<obj []>?functionArguments
+                * !? T<bool>?bottomUp
+                * !? T<bool>? skipSelf
                 ^-> T<unit>
             "emitBubblingEvent" => EventType?name ^-> T<string>
             "remove" => T<unit> ^-> T<unit>
@@ -357,7 +360,7 @@ module Definition =
             "setState" => T<obj>?state ^-> T<unit>
             "extendState" => T<obj>?state ^-> T<unit>
             "getState" => T<unit> ^-> T<obj>
-            "setSize" => T<int>?widht ^-> T<int>?height ^-> T<unit>
+            "setSize" => T<int>?widht * T<int>?height ^-> T<unit>
             "setTitle" => T<string>?title ^-> T<unit>
             "close" => T<unit> ^-> T<unit>
         ]
@@ -402,7 +405,7 @@ module Definition =
             "controlsContainer" =? T<JQuery.JQuery>
 
             "setActiveContentItem" => ContentItemClass.Type?contentItem ^-> T<unit>
-            "createTab" => ContentItemClass.Type?contentItem ^-> T<int>?index ^-> T<unit>
+            "createTab" => ContentItemClass.Type?contentItem * T<int>?index ^-> T<unit>
             "removeTab" => ContentItemClass.Type?contentItem ^-> T<unit>
         ]
 
@@ -426,27 +429,26 @@ module Definition =
         EventEmitterClass
         |+> Instance [
             "on" => EventType?eventName
-                ^-> T<JavaScript.Function>?callback
-                ^-> !? T<obj>?context
+                * T<JavaScript.Function>?callback
+                * !? T<obj>?context
                 ^-> T<unit>
-            "emit" => EventType?eventName ^-> !+ T<obj> ^-> T<unit> 
-            "trigger" => EventType?eventName ^-> !+ T<obj> ^-> T<unit>
+            "emit" => EventType?eventName *+ T<obj> ^-> T<unit> 
+            "trigger" => EventType?eventName *+ T<obj> ^-> T<unit>
             "unbind" 
                 => EventType?eventName
-                ^-> !? T<JavaScript.Function>?callback
-                ^-> !? T<obj>?context
+                * !? T<JavaScript.Function>?callback
+                * !? T<obj>?context
                 ^-> T<unit>
             "off"
                 => EventType?eventName
-                ^-> !? T<JavaScript.Function>?callback
-                ^-> !? T<obj>?context
+                * !? T<JavaScript.Function>?callback
+                * !? T<obj>?context
                 ^-> T<unit>
         ]
 
     // Assembly
 
     let Assembly =
-        //let baseCss = Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css"
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
                 Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
