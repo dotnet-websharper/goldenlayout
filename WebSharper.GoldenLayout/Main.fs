@@ -231,14 +231,14 @@ module Definition =
 
     let Dimensions =
         Pattern.Config "Dimensions" {
-            Required =
+            Required = []
+            Optional =
                 [
                     "width", T<int>
                     "height", T<int>
                     "left", T<int>
                     "top", T<int>
                 ]
-            Optional = []
         }
 
     let GoldenLayout =
@@ -249,11 +249,11 @@ module Definition =
             "unminifyConfig" => T<obj>?minifiedConfig ^-> LayoutConfig.Type
         ]
         |+> Instance [
-            "root" =? T<obj>
+            "root" =? ContentItemClass.Type
             "container" =? T<JQuery.JQuery>
             "isInitialised" =? T<bool>
             "config" =? LayoutConfig.Type
-            "selectedItem" =? T<obj>
+            "selectedItem" =? ContentItemClass.Type
             "width" =? T<int>
             "height" =? T<int>
             "openPopouts" =? Type.ArrayOf BrowserWindowClass.Type
@@ -311,7 +311,7 @@ module Definition =
             "isColumn" =? T<bool>
             "isStack" =? T<bool>
             "isComponent" =? T<bool>
-            "layoutManager" =? GoldenLayout.Type //TODO: test
+            "layoutManager" =? GoldenLayoutClass.Type //TODO: test
             "element" =? T<JQuery.JQuery> //TODO: test
             "childElementContainer" =? T<JQuery.JQuery> //TODO: test
             
@@ -351,7 +351,7 @@ module Definition =
             "width" =? T<int>
             "height" =? T<int>
             "parent" =? ContentItemClass.Type //TODO: not sure
-            "tab" =? TabClass
+            "tab" =? TabClass.Type
             "title" =? T<string>
             "layoutManager" =? GoldenLayoutClass.Type
             "isHidden" =? T<bool>
