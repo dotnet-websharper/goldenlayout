@@ -311,9 +311,9 @@ module Definition =
             "isColumn" =? T<bool>
             "isStack" =? T<bool>
             "isComponent" =? T<bool>
-            "layoutManager" =? GoldenLayoutClass.Type //TODO: test
-            "element" =? T<JQuery.JQuery> //TODO: test
-            "childElementContainer" =? T<JQuery.JQuery> //TODO: test
+            "layoutManager" =? GoldenLayoutClass.Type
+            "element" =? T<JQuery.JQuery>
+            "childElementContainer" =? T<JQuery.JQuery>
             
             "addChild" => (TSelf + GeneralItemConfig.Type)?itemOrGeneralItemConfig * !? T<int>?index ^-> T<unit>
             "removeChild" => TSelf?contentItem * !? T<bool>?keepChild ^-> T<unit>
@@ -350,7 +350,7 @@ module Definition =
         |+> Instance [
             "width" =? T<int>
             "height" =? T<int>
-            "parent" =? ContentItemClass.Type //TODO: not sure
+            "parent" =? ContentItemClass.Type
             "tab" =? TabClass.Type
             "title" =? T<string>
             "layoutManager" =? GoldenLayoutClass.Type
@@ -373,7 +373,7 @@ module Definition =
                 [
                     "dimensions", Dimensions.Type
                     "content", Type.ArrayOf GeneralItemConfig.Type
-                    "parentId", T<string> //TODO: possible T<string []> too?
+                    "parentId", T<string>
                     "indexInParent", T<int>
                 ]
             Optional = []
