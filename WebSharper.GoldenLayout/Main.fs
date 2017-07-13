@@ -7,14 +7,22 @@ open WebSharper.InterfaceGenerator
 module Definition =
 
     // Classes
-
-    let GoldenLayoutClass = Class "GoldenLayout"
-    let ContentItemClass = Class "ContentItem"
-    let ContainerClass = Class "Container"
-    let BrowserWindowClass = Class "BrowserWindow"
+    
+    let EventEmitterClass = Class "EventEmitter"
+    let GoldenLayoutClass =
+        Class "GoldenLayout"
+        |=> Inherits EventEmitterClass
+    let ContentItemClass =
+        Class "ContentItem"
+        |=> Inherits EventEmitterClass
+    let ContainerClass =
+        Class "Container"
+        |=> Inherits EventEmitterClass
+    let BrowserWindowClass =
+        Class "BrowserWindow"
+        |=> Inherits EventEmitterClass
     let HeaderClass = Class "Header"
     let TabClass = Class "Tab"
-    let EventEmitterClass = Class "EventEmitter"
 
     // Events
 
