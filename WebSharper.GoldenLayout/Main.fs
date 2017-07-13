@@ -265,7 +265,7 @@ module Definition =
                 ^-> T<unit>
             "init" => T<unit> ^-> T<unit>
             "toConfig" => T<unit> ^-> LayoutConfig.Type
-            "getComponent" => T<string>?name ^-> T<JavaScript.Function> //TODO: test
+            "getComponent" => T<string>?name ^-> (ContainerClass.Type?container * T<obj>?state ^-> T<unit>)
             "updateSize" => !? T<int>?width * !? T<int>?height ^-> T<unit>
             "destroy" => T<unit> ^-> T<unit>
             "createContentItem"
@@ -429,19 +429,19 @@ module Definition =
         EventEmitterClass
         |+> Instance [
             "on" => EventType?eventName
-                * T<JavaScript.Function>?callback
+                * (!+ T<obj> ^-> T<unit>)?callback
                 * !? T<obj>?context
                 ^-> T<unit>
             "emit" => EventType?eventName *+ T<obj> ^-> T<unit> 
             "trigger" => EventType?eventName *+ T<obj> ^-> T<unit>
             "unbind" 
                 => EventType?eventName
-                * !? T<JavaScript.Function>?callback
+                * !? (!+ T<obj> ^-> T<unit>)?callback
                 * !? T<obj>?context
                 ^-> T<unit>
             "off"
                 => EventType?eventName
-                * !? T<JavaScript.Function>?callback
+                * !? (!+ T<obj> ^-> T<unit>)?callback
                 * !? T<obj>?context
                 ^-> T<unit>
         ]
