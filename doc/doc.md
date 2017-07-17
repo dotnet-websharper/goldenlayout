@@ -30,6 +30,7 @@ have to look out for the value of the config object's_ `Type` _property when dec
 you can ask for type-specific fields!_
 
 The factory methods are all static methods of the `ItemFactory` type.
+
 Method name|Signature
 ---|---
 `CreateComponent`|`(Component * Item) -> GeneralItemConfig`|
@@ -41,18 +42,21 @@ Method name|Signature
 The `row` and `column` types don't require any special config fields. The other config objects listed here:
 
 __**Component**__
+
 Field|Type|Required
 ---|:---:|:---:
 `ComponentName`|`string`|**required**
 `ComponentName`|`obj`|-
 
 __**ReactComponent**__
+
 Field|Type|Required
 ---|:---:|:---:
 `Component`|`string`|**required**
 `Props`|`obj`|-
 
 __**Stack**__
+
 Field|Type|Required
 ---|:---:|:---:
 `ActiveItemIndex`|`int`|-
@@ -101,6 +105,7 @@ The rest of the API should be already familiar from the original [documentation]
 The config for layouts is much more analog with the original specification.
 
 __**Layout**__
+
 Field|Type|Required
 ---|---|:---:
 `Settings`|`LayoutSettings`|-
