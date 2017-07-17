@@ -9,6 +9,23 @@ between the original library and the extension's API.
 
 ## Usage
 
+### Include the stylesheets
+
+As with many other libraries, Golden Layout comes with its own stylesheets. In WebSharper,
+the canonical way to include these extra resources is to use the `Require` attribute on
+the desired `module` or function.
+
+In this case, since the order of the `Require` attributes counts, we include the
+`GoldenLayout.Resources.BaseCss`, and then either the `DarkTheme` or the `LightTheme`.
+
+```fsharp
+[<Require(typeof<GoldenLayout.Resources.BaseCss>)>]
+[<Require(typeof<GoldenLayout.Resources.LightTheme>)>]
+[<JavaScript>]
+module Client =
+    // . . .
+```
+
 ### ContentItem config
 
 You can create 5 different types of _ContentItems_: `component`, `react-component`,
@@ -196,7 +213,7 @@ layoutManager.On(
     fun (params: obj []) -> //the callback function
         Console.Log("The Layout has been initialised.")
         Console.Log(params)
-    )
+)
 ```
 
 ## Examples
