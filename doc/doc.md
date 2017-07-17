@@ -13,14 +13,17 @@ between the original library and the extension's API.
 
 You can create 5 different types of _ContentItems_: `component`, `react-component`,
 `column`, `row` and `stack`. The config object would have different special fields added
-depending on the item's type. As this would not work very in well a statically typed
-environment, the extension takes a little different approach.
+depending on the item's type. As this would not work very well in a statically typed
+environment, the extension takes a slightly different approach.
 
 1. You have the **Item** struct with all common properties
 2. You have a different config struct for each type with their special properties
-3. You combine them with a factory method
+3. You combine them with a factory method to get the full _ContentItem_ config
 
-The result will be a type called `GeneralItemConfig`. **Note:** the `GeneralItemConfig` is
+
+The result will be of a type called `GeneralItemConfig`.
+
+**Note:** the `GeneralItemConfig` is
 not intended for you to create the config with. It is used when the original library would
 return or pass a `ContentItem` config as a parameter. _This means that in these cases you
 have to look out for the value of the config object's_ `Type` _property when deciding if
@@ -38,22 +41,102 @@ Method name|Signature
 The `row` and `column` types don't require any special config fields. The other config objects listed here:
 
 __**Component**__
-Parameter|Type|Required
----|---|---
+Field|Type|Required
+---|:---:|:---:
 `ComponentName`|`string`|**required**
-`ComponentName`|`obj`|optional
+`ComponentName`|`obj`|-
 
 __**ReactComponent**__
-Parameter|Type|Required
----|---|---
+Field|Type|Required
+---|:---:|:---:
 `Component`|`string`|**required**
-`Props`|`obj`|optional
+`Props`|`obj`|-
 
 __**Stack**__
-Parameter|Type|Required
----|---|---
-ActiveItemIndex|`int`|optional
+Field|Type|Required
+---|:---:|:---:
+`ActiveItemIndex`|`int`|-
 
 #### Example
 
+```fsharp
+    let inputComponent =
+        ItemFactory.CreateComponent(
+            Component(
+                componentName = "input-component"
+            ),
+            Item(
+                Title = "Markdown",
+                IsClosable = false
+            )
+        )
+        
+    let outputComponent = 
+        ItemFactory.CreateComponent(
+            Component(
+                componentName = "output-component"
+            ),
+            Item(
+                Title = "Preview",
+                IsClosable = false
+            )
+        )
 
+    let mainComponent =
+        ItemFactory.CreateRow(
+            Item(
+                Content = [|
+                    inputComponent
+                    outputComponent
+                |],
+                IsClosable = false
+            )
+        )
+```
+
+The rest of the API should be already familiar from the original [documentation](http://golden-layout.com/docs/).
+
+### Layout config
+
+The config for layouts is much more analog with the original specification.
+
+__**Layout**__
+Field|Type|Required
+---|---|:---:
+`Settings`|`LayoutSettings`|-
+`Dimensions`|`LayoutDimensions`|-
+`Labels`|`LayoutLabels`|-
+`Content`|`GeneralItemConfig []`|-
+
+The usage of the fields can be found
+[here](http://golden-layout.com/docs/Config.html) in the original docs.
+
+### Events
+
+The `GoldenLayout`, `ContentItem`, `Container` and `BrowserWindow` classes all
+inherit the functionality of the `EventEmitter` class with all of them having
+their respective events, too. To make things easier and faster, these classes'
+respective events have been collected into enums called `{ClassName}Event`.
+The methods of the `EventEmitter` class which take an `"event"` as parameter
+have all been overloaded for these enums. You can still choose to pass an event
+name as a `string`, but using these enums will make your code safer.
+
+Here's an example:
+
+```fsharp
+let layoutManager = 
+
+layoutManager.On(
+    LayoutEvent.Initialised, //an event from the LayoutEvent enum
+    fun (params: obj []) -> //the callback function
+        Console.Log("The Layout has been initialised.")
+        Console.Log(params)
+    )
+```
+
+## Examples
+
+For fully working examples, visit these links:
+* [Programatically created tabs](http://try.websharper.com/snippet/adam.abonyi-toth/0000EM)
+* [Dynamically adding tabs](http://try.websharper.com/snippet/adam.abonyi-toth/0000EN)
+* [Reactive Markdown editor with "Preview" tab](http://try.websharper.com/snippet/adam.abonyi-toth/0000EO)
