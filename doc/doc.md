@@ -219,6 +219,7 @@ layoutManager.On(
 ## Examples
 
 For fully working examples, visit these links:
+
 * [Programatically created tabs](http://try.websharper.com/snippet/adam.abonyi-toth/0000EM)
 * [Dynamically adding tabs](http://try.websharper.com/snippet/adam.abonyi-toth/0000EN)
 * [Reactive Markdown editor with "Preview" tab](http://try.websharper.com/snippet/adam.abonyi-toth/0000EO)
