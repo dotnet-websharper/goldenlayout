@@ -9,30 +9,47 @@ between the original library and the extension's API.
 
 ## Usage
 
+### Include the stylesheets
+
+As with many other libraries, Golden Layout comes with its own stylesheets. In WebSharper,
+the canonical way to include these extra resources is to use the `Require` attribute on
+the desired `module` or function.
+
+In this case, since the order of the `Require` attributes counts, we include the
+`GoldenLayout.Resources.BaseCss`, and then either the `DarkTheme` or the `LightTheme`.
+
+```fsharp
+[<Require(typeof<GoldenLayout.Resources.BaseCss>)>]
+[<Require(typeof<GoldenLayout.Resources.LightTheme>)>]
+[<JavaScript>]
+module Client =
+    // . . .
+```
+
 ### ContentItem config
 
 You can create 5 different types of _ContentItems_: `component`, `react-component`,
 `column`, `row` and `stack`. The config object would have different special fields added
 depending on the item's type. As this would not work very well in a statically typed
-environment, the extension takes a slightly different approach.
+environment, the extension takes a slightly different approach:
 
-1. You have the **Item** struct with all common properties
+1. You have the `Item` struct with all common properties
 2. You have a different config struct for each type with their special properties
-3. You combine them with a factory method to get the full _ContentItem_ config
+3. You combine them with a factory method to get the full _ContentItem_ config 
 
 
 The result will be of a type called `GeneralItemConfig`.
 
-**Note:** the `GeneralItemConfig` is
-not intended for you to create the config with. It is used when the original library would
-return or pass a `ContentItem` config as a parameter. _This means that in these cases you
-have to look out for the value of the config object's_ `Type` _property when deciding if
-you can ask for type-specific fields!_
+>**Note:** the `GeneralItemConfig` is
+>not intended for you to create the config with. It is used when the original library would
+>return or pass a `ContentItem` config as a parameter. _This means that in these cases you
+>have to look out for the value of the config object's_ `Type` _property when deciding if
+>you can ask for type-specific fields!_
 
 The factory methods are all static methods of the `ItemFactory` type.
 
 Method name|Signature
----|---
+---:|---
 `CreateComponent`|`(Component * Item) -> GeneralItemConfig`|
 `CreateReactComponent`|`(ReactComponent * Item) -> GeneralItemConfig`|
 `CreateStack`|`(Stack * Item) -> GeneralItemConfig`|
@@ -64,41 +81,45 @@ Field|Type|Required
 #### Example
 
 ```fsharp
-    let inputComponent =
+    type State = {Text: string}
+
+    let helloComponent =
         ItemFactory.CreateComponent(
             Component(
-                componentName = "input-component"
+                componentName = "hello-component",
+                ComponentState = {Text = "Hello, "}
             ),
             Item(
-                Title = "Markdown",
+                Title = "Hello",
                 IsClosable = false
             )
         )
         
-    let outputComponent = 
+    let worldComponent = 
         ItemFactory.CreateComponent(
             Component(
-                componentName = "output-component"
+                componentName = "world-component",
+                ComponentState = {Text = "World!"}
             ),
             Item(
-                Title = "Preview",
+                Title = "World!",
                 IsClosable = false
             )
         )
 
-    let mainComponent =
+    let mainContentItem =
         ItemFactory.CreateRow(
             Item(
                 Content = [|
-                    inputComponent
-                    outputComponent
+                    helloComponent
+                    worldComponent
                 |],
                 IsClosable = false
             )
         )
 ```
 
-The rest of the API should be already familiar from the original [documentation](http://golden-layout.com/docs/).
+The rest of the API should be familiar from the [original documentation](http://golden-layout.com/docs/).
 
 ### Layout config
 
@@ -113,17 +134,73 @@ Field|Type|Required
 `Labels`|`LayoutLabels`|-
 `Content`|`GeneralItemConfig []`|-
 
-The usage of the fields can be found
+The usage of these fields can be found
 [here](http://golden-layout.com/docs/Config.html) in the original docs.
 
-### Events
+### Instantiation
+
+Now that we know how to describe our layout and content item configs, we can finally
+instantiate the main layout manager class which is called `GoldenLayout`. You can
+either pass the constructor a `Layout` config, or a `Layout` config and a `JQuery`
+or `Dom.Element` as the container to create the layout in. Otherwise, the DOM of the
+layout will be appended to the `<body>` of your HTML file. Let's look at an example
+using the configs defined before:
+
+```fsharp
+let layoutManager =
+    GoldenLayout(
+        Layout(
+            Content = [|
+                mainContentItem
+            |]
+        )
+    )
+```
+
+### Registering components
+
+When we have our layout manager ready, we can start to _register our components_.
+This means that we will bind a function to every _component name_, which function
+when given the _container_ and the _state_ of the component, will produce the
+content of the component into the _container_.
+
+```fsharp
+layoutManager.RegisterComponent(
+    "hello-component", 
+    fun (container, s) ->
+        let state = s :?> State
+        (h3 [text state.Text]).Html
+        |> container.GetElement().Html
+        |> fun jq -> jq.Ignore
+        
+layoutManager.RegisterComponent(
+    "world-component", 
+    fun (container, s) ->
+        let state = s :?> State
+        (h2 [text state.Text]).Html
+        |> container.GetElement().Html
+        |> fun jq -> jq.Ignore
+)
+```
+
+### Initialising
+
+We've created our layout manager and registered our components, but the layout won't
+work just yet. We have to initialise it manually.
+
+```fsharp
+layoutManager.Init()
+```
+The layouts should appear now as described in their configs.
+
+## Events
 
 The `GoldenLayout`, `ContentItem`, `Container` and `BrowserWindow` classes all
 inherit the functionality of the `EventEmitter` class with all of them having
 their respective events, too. To make things easier and faster, these classes'
 respective events have been collected into enums called `{ClassName}Event`.
-The methods of the `EventEmitter` class which take an `"event"` as parameter
-have all been overloaded for these enums. You can still choose to pass an event
+All methods of the `EventEmitter` class which take an `"event"` as parameter
+have been overloaded for these enums. You can still choose to pass the event
 name as a `string`, but using these enums will make your code safer.
 
 Here's an example:
@@ -136,12 +213,13 @@ layoutManager.On(
     fun (params: obj []) -> //the callback function
         Console.Log("The Layout has been initialised.")
         Console.Log(params)
-    )
+)
 ```
 
 ## Examples
 
 For fully working examples, visit these links:
+
 * [Programatically created tabs](http://try.websharper.com/snippet/adam.abonyi-toth/0000EM)
 * [Dynamically adding tabs](http://try.websharper.com/snippet/adam.abonyi-toth/0000EN)
 * [Reactive Markdown editor with "Preview" tab](http://try.websharper.com/snippet/adam.abonyi-toth/0000EO)
