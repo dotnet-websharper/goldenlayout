@@ -462,9 +462,9 @@ module Definition =
                 Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
                     |> AssemblyWide
                     |> RequiresExternal [ T<WebSharper.JQuery.Resources.JQuery> ]
-                Resource "BaseCss" "http://golden-layout.com/files/latest/css/goldenlayout-base.css" 
-                Resource "DarkTheme" "http://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
-                Resource "LightTheme" "http://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
+                Resource "BaseCss" "https://golden-layout.com/files/latest/css/goldenlayout-base.css" 
+                Resource "DarkTheme" "https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
+                Resource "LightTheme" "https://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
             ]
             Namespace "WebSharper.GoldenLayout" [
                 LayoutEvents
