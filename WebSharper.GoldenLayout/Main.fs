@@ -454,17 +454,33 @@ module Definition =
                 ^-> T<unit>
         ]
 
+    module Res =
+        let Js =
+            Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
+            |> AssemblyWide
+            |> RequiresExternal [ T<WebSharper.JQuery.Resources.JQuery> ]
+
+        let BaseCss =
+            Resource "BaseCss" "https://golden-layout.com/files/latest/css/goldenlayout-base.css"
+            |> AssemblyWide
+
+        let DarkTheme =
+            Resource "DarkTheme" "https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
+            |> Requires [ BaseCss ]
+
+        let LightTheme =
+            Resource "LightTheme" "https://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
+            |> Requires [ BaseCss ]
+
     // Assembly
 
     let Assembly =
         Assembly [
             Namespace "WebSharper.GoldenLayout.Resources" [
-                Resource "Js" "https://golden-layout.com/files/latest/js/goldenlayout.min.js"
-                    |> AssemblyWide
-                    |> RequiresExternal [ T<WebSharper.JQuery.Resources.JQuery> ]
-                Resource "BaseCss" "https://golden-layout.com/files/latest/css/goldenlayout-base.css" 
-                Resource "DarkTheme" "https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css"
-                Resource "LightTheme" "https://golden-layout.com/files/latest/css/goldenlayout-light-theme.css"
+                Res.Js
+                Res.BaseCss
+                Res.DarkTheme
+                Res.LightTheme
             ]
             Namespace "WebSharper.GoldenLayout" [
                 LayoutEvents
