@@ -3,10 +3,10 @@ namespace WebSharper.GoldenLayout.Sample
 open WebSharper
 open WebSharper.JavaScript
 open WebSharper.JQuery
-open WebSharper.UI.Next
-open WebSharper.UI.Next.Client
-open WebSharper.UI.Next.Html
-open WebSharper.UI.Next.Templating
+open WebSharper.UI
+open WebSharper.UI.Client
+open WebSharper.UI.Html
+open WebSharper.UI.Templating
 open WebSharper.GoldenLayout
 
 [<Require(typeof<GoldenLayout.Resources.BaseCss>)>]
@@ -63,7 +63,7 @@ module Client =
             "example", 
             fun (container, s) ->
                 let state = s :?> State
-                (h2 [text state.Text]).Html
+                (h2 [] [text state.Text]).Html
                 |> container.GetElement().Html
                 |> ignore
         )
@@ -71,7 +71,7 @@ module Client =
         //gl.Root.GetItemsById("main-window").[0]
         IndexTemplate.AddTemplate()
             .TabName(tabName)
-            .TabCreate(fun () ->
+            .TabCreate(fun _ ->
                 let component_ =
                     ItemFactory.CreateComponent(
                         Component(
@@ -85,7 +85,7 @@ module Client =
                 gl.Root.GetItemsById("main-window").[0].AddChild(component_)
                 Console.Log "length:"
                 Console.Log (gl.Root.GetItemsById("main-window").Length)
-            ).LogButton(fun () -> Console.Log gl)
+            ).LogButton(fun _ -> Console.Log gl)
             .Doc()
             
         |> Doc.RunById "menu"

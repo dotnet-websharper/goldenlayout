@@ -8,3 +8,9 @@
 /packages/
 /tools/packages/
 /WebSharper.GoldenLayout.Sample/Content/
+
+bin/
+obj/
+/.fake/
+/paket-files/
+/.vscode/
