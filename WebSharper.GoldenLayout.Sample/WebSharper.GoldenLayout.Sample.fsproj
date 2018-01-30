@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <WebSharperProject>Bundle</WebSharperProject>
@@ -14,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="../WebSharper.GoldenLayout\WebSharper.GoldenLayout.fsproj" />
   </ItemGroup>
+  <Import Project="..\paket-files\wsbuild\github.com\dotnet-websharper\build-script\WebSharper.Fake.targets" Condition="Exists('..\paket-files\wsbuild\github.com\dotnet-websharper\build-script\WebSharper.Fake.targets')" />
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
 <!-- <?xml version="1.0" encoding="utf-8"?> -->
