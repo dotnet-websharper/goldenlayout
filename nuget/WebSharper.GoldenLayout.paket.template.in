@@ -11,8 +11,8 @@ description
 tags
     Web JavaScript F# C#
 files
-    ../WebSharper.GoldenLayout/bin/Release/netstandard2.0/WebSharper.GoldenLayout.dll ==> lib/net461
-    ../WebSharper.GoldenLayout/bin/Release/netstandard2.0/WebSharper.GoldenLayout.xml ==> lib/net461
+    ../WebSharper.GoldenLayout/bin/Release/net461/WebSharper.GoldenLayout.dll ==> lib/net461
+    ../WebSharper.GoldenLayout/bin/Release/net461/WebSharper.GoldenLayout.xml ==> lib/net461
     ../WebSharper.GoldenLayout/bin/Release/netstandard2.0/WebSharper.GoldenLayout.dll ==> lib/netstandard2.0
     ../WebSharper.GoldenLayout/bin/Release/netstandard2.0/WebSharper.GoldenLayout.xml ==> lib/netstandard2.0
 dependencies
