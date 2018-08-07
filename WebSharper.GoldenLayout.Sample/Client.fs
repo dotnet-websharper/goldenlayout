@@ -63,7 +63,7 @@ module Client =
             "example", 
             fun (container, s) ->
                 let state = s :?> State
-                (h2 [] [text state.Text]).Html
+                (Elt.h2 [] [text state.Text]).Html
                 |> container.GetElement().Html
                 |> ignore
         )
