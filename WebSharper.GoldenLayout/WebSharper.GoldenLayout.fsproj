@@ -1,9 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
-    <WebSharperProject>Extension</WebSharperProject>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <WebSharperProject>binding</WebSharperProject>
     <WebSharperSourceMap>false</WebSharperSourceMap>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Product>WebSharper.GoldenLayout 2.6.0+</Product>
+    <Title>https://github.com/dotnet-websharper/GoldenLayout/</Title>
+    <Company>IntelliFactory</Company>
+    <Copyright>(c) 2008-2026 IntelliFactory</Copyright>
+    <!-- Single-element tuple lists are idiomatic in WIG definitions. -->
+    <NoWarn>$(NoWarn);FS3886</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NpmDependencies>
+      <NpmPackage Name="golden-layout" Version="&gt;= 2.6.0 &lt; 3.0.0" ResolutionStrategy="Max" />
+    </NpmDependencies>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Main.fs" />

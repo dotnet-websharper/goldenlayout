@@ -1,38 +1,117 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>WebSharper.GoldenLayout.Sample</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="Content/WebSharper.GoldenLayout.Sample.css" />
-    <style>
-        #menu {
-            height: 2em;
-            position: absolute;
-            width: 100%;
-            top: 0%;
-            left: 0%;
-        }
-        #gl-container {
-            height: 90%;
-            width: 100%;
-            position: absolute;
-            top: 2em;
-            left: 0%;
-        }
-        /* Don't show the not-yet-loaded templates */
-        [ws-template], [ws-children-template] { display: none; }
-    </style>
-    <script type="text/javascript" src="Content/WebSharper.GoldenLayout.Sample.head.js"></script>
+    <title>WebSharper.GoldenLayout — sample</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230f766e'/%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z' fill='white'/%3E%3C/svg%3E" />
+    <script>
+        // Apply a previously chosen theme before first paint. Light is the
+        // default; the key is shared with Client.fs (themeStorageKey).
+        try {
+            var t = localStorage.getItem('websharper-goldenlayout-theme');
+            if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { }
+    </script>
+    <link rel="stylesheet" href="css/goldenlayout-base.css" />
+    <link id="gl-theme" rel="stylesheet" href="css/themes/goldenlayout-light-theme.css" />
+    <link rel="stylesheet" href="site.css" />
+    <!-- golden-layout is bundled from the npm package; the WebSharper head is folded in here. -->
+    <!-- ws-head -->
 </head>
-<body id="main">
-    <div id="menu" ws-children-template="AddTemplate">
-        <input type="text" ws-var="TabName" />
-        <button ws-onclick="TabCreate" >Create Tab</button>
-        <button ws-onclick="LogButton">Log</button>
-    </div>
-    <div id="gl-container">
-    </div>
-    <script type="text/javascript" src="Content/WebSharper.GoldenLayout.Sample.min.js"></script>
+<body>
+    <header class="app-header">
+        <div class="app-titles">
+            <h1>WebSharper.GoldenLayout</h1>
+            <p>Golden Layout 2 bindings for F# — with <a href="https://websharper.com">WebSharper</a></p>
+        </div>
+        <div class="app-actions">
+            <button class="btn theme-toggle" ws-onclick="ToggleTheme" title="Switch between the light and dark theme">
+                <span>${themeLabel}</span>
+            </button>
+            <a class="app-source" href="https://github.com/dotnet-websharper/GoldenLayout">Source</a>
+        </div>
+    </header>
+
+    <main class="page">
+        <p class="status">${status}</p>
+
+        <section class="card">
+            <header class="card-header">
+                <h2>Layout manager</h2>
+                <p>
+                    A <code>GoldenLayout</code> instance created on the container below, with
+                    two registered component types (<code>hello</code>, <code>clock</code>) and
+                    a stack of tabs. The toolbar exercises <code>LayoutManager</code>,
+                    <code>ContentItem</code>, <code>Stack</code>, <code>ComponentItem</code> and
+                    <code>ComponentContainer</code>.
+                </p>
+            </header>
+
+            <div class="toolbar">
+                <button class="btn btn-primary" ws-onclick="CreateLayout">Create layout</button>
+                <button class="btn" ws-onclick="DestroyLayout">Destroy</button>
+                <span class="spacer"></span>
+                <button class="btn" ws-onclick="AddComponent">AddComponent</button>
+                <button class="btn" ws-onclick="AddAtLocation">NewComponentAtLocation</button>
+                <button class="btn" ws-onclick="AddClock">NewComponent(clock)</button>
+                <button class="btn" ws-onclick="FocusNext">Activate next tab</button>
+                <button class="btn" ws-onclick="Maximise">Toggle maximise</button>
+                <button class="btn" ws-onclick="CloseFocused">Close focused</button>
+                <button class="btn" ws-onclick="Popout">Popout</button>
+                <button class="btn" ws-onclick="Rename">Rename</button>
+            </div>
+
+            <div id="layout" class="layout-host"></div>
+
+            <div class="toolbar">
+                <button class="btn" ws-onclick="SaveLayout">SaveLayout + minify</button>
+                <button class="btn" ws-onclick="LoadSaved">LoadLayout(fromResolved)</button>
+                <button class="btn" ws-onclick="ClearLayout">Clear</button>
+                <button class="btn" ws-onclick="Inspect">RootItem.ToConfig</button>
+                <button class="btn" ws-onclick="Resize">SetSize</button>
+                <button class="btn" ws-onclick="Broadcast">emitUserBroadcast</button>
+                <button class="btn" ws-onclick="AddDragSource">NewDragSource</button>
+                <button class="btn" ws-onclick="RemoveDragSource">RemoveDragSource</button>
+                <button class="btn" ws-onclick="TryErrors">Throw/catch</button>
+            </div>
+
+            <div id="drag-card" class="drag-card">
+                <strong>Drag me</strong>
+                <span>This card is a drag source — drop it into the layout.</span>
+            </div>
+
+            <p class="status">${info}</p>
+            <p class="status">${savedInfo}</p>
+        </section>
+
+        <section class="card">
+            <header class="card-header">
+                <h2>Saved layout</h2>
+                <p>
+                    What <code>LayoutManager.SaveLayout()</code> returns (a
+                    <code>ResolvedLayoutConfig</code>), plus the result of
+                    <code>ResolvedLayoutConfig.MinifyConfig</code>.
+                </p>
+            </header>
+            <pre class="json">${layoutJson}</pre>
+        </section>
+
+        <section class="card">
+            <header class="card-header">
+                <h2>Events</h2>
+                <p>
+                    Typed overloads of <code>on</code>/<code>off</code>/<code>emit</code>: one
+                    single-case event-name enum per event, so every payload is typed
+                    (<code>Tab</code>, <code>ComponentItem</code>, <code>BubblingEvent</code>,
+                    <code>BrowserPopout</code>, …).
+                </p>
+            </header>
+            <pre class="log">${events}</pre>
+            <p class="status">registered component types: ${registered}</p>
+        </section>
+    </main>
+
+    <script type="text/javascript" src="Scripts/WebSharper.GoldenLayout.Sample.min.js"></script>
 </body>
 </html>
