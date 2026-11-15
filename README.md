@@ -24,7 +24,7 @@ This repository contains:
 
 ## Live demos
 
-**Try it live:** [Open the sample in your browser](https://dotnet-websharper.github.io/GoldenLayout/)
+**Try it live:** [Open the sample in your browser](https://dotnet-websharper.github.io/goldenlayout/)
 
 ![Golden Layout sample](docs/sample.png)
 
@@ -36,7 +36,7 @@ the layout (including `MinifyConfig`) and logs every typed event. It is
 light-themed by default and has a light/dark theme switcher (persisted in
 `localStorage`) that also swaps Golden Layout's own light/dark theme.
 
-- **Sample (this repository):** <https://dotnet-websharper.github.io/GoldenLayout/>
+- **Sample (this repository):** <https://dotnet-websharper.github.io/goldenlayout/>
 - **Source repository:** <https://github.com/dotnet-websharper/GoldenLayout>
 - **WebSharper bindings:** <https://websharper.com/bindings>
 
